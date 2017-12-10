@@ -1,16 +1,16 @@
 import uri, tables, sequtils
 
+
 proc parseQuery*(query: string): OrderedTableRef[string, string] = 
   ## parses the query part of an uri.
-  var start = 0
   var key, val = ""
   var queryBlock = ""
   if query == "":
     return
   result = newOrderedTable[string, string]()
   for i in 0..query.len:
+    # echo i , " ", query[i]
     if query[i] == '&' or i == query.len:
-      start = i
       var inval = false
       for each in queryBlock:
         if not inval and each == '=': 
@@ -30,7 +30,7 @@ proc parseQuery*(query: string): OrderedTableRef[string, string] =
 proc parseQuery*(uri: Uri): OrderedTableRef[string, string] =
   return parseQuery(uri.query)
   
-proc newQuery(query: OrderedTableRef[string, string]): string =
+proc newQuery*(query: OrderedTableRef[string, string]): string =
   ## generates a query string
   ## eg: "faa=faa%3Dfaa"
   result = ""
@@ -41,6 +41,9 @@ proc newQuery(query: OrderedTableRef[string, string]): string =
     result.add(key.encodeUrl() & "=" & val.encodeUrl())
 
 when isMainModule:
+  # echo { "foo": "baa", "baz": "bahhz", "baz": "bahhz2"}.newOrderedTable()
+  echo "foo=baa&baz=bahhz&baz=bahhz2".parseQuery()
+  # quit()
   block: # parseQuery & newQuery tests
     assert "foo=baa&baz=bahhz&baz=bahhz2".parseQuery() == 
         { "foo": "baa", "baz": "bahhz", "baz": "bahhz2"}.newOrderedTable()
